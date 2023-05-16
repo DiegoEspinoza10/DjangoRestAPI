@@ -89,3 +89,32 @@ class MoreMoney4Club(APIView):
 #---------------------------
 #|   Views for Players     |
 #---------------------------
+
+class AddPlayer(APIView):
+    def post(self,request):
+        club_name = request.data.get('club_name')
+        
+        club = get_object_or_404(Club,name=club_name)
+
+        serializer = PlayerSerializer(data = request.data) 
+        if serializer.is_valid():
+            player = serializer.save(club = club)
+            serializer = PlayerSerializer(player)
+            return Response(serializer.data)
+        else:
+            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)    
+
+class ShowPlayers(APIView):
+    def get(self,request):
+        players = Player.objects.all()
+        serializer = PlayerSerializer(players,many=True)
+        return Response(serializer.data)   
+
+class getByNationality(APIView):
+    def get(self,request,nation):
+        try:
+            player = Player.objects.filter(nationallity = nation)
+        except Player.DoesNotExist:
+            return Response("No player with that nationality",status=status.HTTP_404_NOT_FOUND)
+        serializer = PlayerSerializer(player,many=True)
+        return Response(serializer.data)
