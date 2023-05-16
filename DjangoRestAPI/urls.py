@@ -16,12 +16,17 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import path
-from SoccerAPI.views import ShowLeagues,AddLeagues,AddClub,ShowClubs,ShowClubsByLeague
+from SoccerAPI.views import ShowLeagues,AddLeagues,AddClub,ShowClubs,ShowClubsByLeague,MoreMoney4Club,SpecificClub
 
 urlpatterns = [
+    #------------League URLS------------
     path('league/list/',ShowLeagues.as_view()),
     path('addleague/',AddLeagues.as_view()),
+    #-------------Club URLS-------------
     path('addclub/',AddClub.as_view()),
     path('clubs/list/',ShowClubs.as_view()),
-    path('clubsxleague/<str:league>',ShowClubsByLeague.as_view())
+    path('clubsxleague/<str:league>',ShowClubsByLeague.as_view()),
+    path('addmoney/<str:name>',MoreMoney4Club.as_view()),
+    path('searchclub/<str:name>',SpecificClub.as_view())
+    #------------Players URLS------------
 ]

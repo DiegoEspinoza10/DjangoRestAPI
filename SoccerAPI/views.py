@@ -7,6 +7,10 @@ from django.shortcuts import get_object_or_404
 
 # Create your views here.
 
+#---------------------------
+#|   Views for Leagues     |
+#---------------------------
+
 class ShowLeagues(APIView):
     def get(self,request):
         leagues = League.objects.all()
@@ -22,6 +26,10 @@ class AddLeagues(APIView):
         else: 
             return Response(serializer.errors,status = status.HTTP_400_BAD_REQUEST)
         
+#---------------------------
+#|   Views for Clubs       |
+#---------------------------
+#         
 class ShowClubs(APIView):
     def get(self,request):
         clubs = Club.objects.all()
@@ -39,6 +47,15 @@ class ShowClubsByLeague(APIView):
         serializer = ClubSerializer(clubs, many=True)
         return Response(serializer.data)
 
+class SpecificClub(APIView):
+    def get(self,request,name):
+        try:
+            club = Club.objects.get(name = name)
+        except Club.DoesNotExist:
+            return Response("Club does not excist",status=status.HTTP_404_NOT_FOUND)
+        serializer = ClubSerializer(club,many=False)
+        return Response(serializer.data)
+
 
 class AddClub(APIView):
     def post(self, request):
@@ -53,5 +70,22 @@ class AddClub(APIView):
             return Response(serializer.data)
         else:
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+        
+        
+class MoreMoney4Club(APIView):
+    def put(self,request,name):
+        added_money = request.data.get('money')
+        added_money
+        try:
+            club = Club.objects.get(name=name)
+        except Club.DoesNotExist:
+            return Response("Club not found",status=status.HTTP_404_NOT_FOUND)
+        club.budget += added_money
+        club.save()
+        serializer = ClubSerializer(club,many=False)
+        return Response(serializer.data)
 
 
+#---------------------------
+#|   Views for Players     |
+#---------------------------
