@@ -152,4 +152,5 @@ class TransferPlayer(APIView):
             serializer = PlayerSerializer(player,many=False)
             return Response(serializer.data)
         
+      
         
