@@ -128,3 +128,28 @@ class getByClub(APIView):
         player = Player.objects.filter(club=club_obj)
         serializer = PlayerSerializer(player, many=True)
         return Response(serializer.data)
+
+class TransferPlayer(APIView):
+    def put(self,request):
+        new_club = request.data.get('club_name')
+        name_player = request.data.get('player_name')
+        try:
+            club_obj = Club.objects.get(name = new_club)
+        except:
+            return Response('There is no club with that name',status=status.HTTP_404_NOT_FOUND)
+        try:
+            player = Player.objects.get(last_name = name_player)
+        except:
+            return Response('There is no player with that name',status=status.HTTP_404_NOT_FOUND)
+        
+        if club_obj.budget < player.price:
+            return Response('The club does not have enough money to buy the player',status=status.HTTP_401_UNAUTHORIZED)
+        else:
+            player.club = club_obj
+            player.save()
+            club_obj.budget -= player.price
+            club_obj.save()
+            serializer = PlayerSerializer(player,many=False)
+            return Response(serializer.data)
+        
+        
