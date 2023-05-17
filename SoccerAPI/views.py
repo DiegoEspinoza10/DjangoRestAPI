@@ -118,3 +118,13 @@ class getByNationality(APIView):
             return Response("No player with that nationality",status=status.HTTP_404_NOT_FOUND)
         serializer = PlayerSerializer(player,many=True)
         return Response(serializer.data)
+    
+class getByClub(APIView):
+    def get(self,request,club):
+        try:
+            club_obj = Club.objects.get(name = club)
+        except:
+            return Response('No player plays for that club',status=status.HTTP_404_NOT_FOUND)
+        player = Player.objects.filter(club=club_obj)
+        serializer = PlayerSerializer(player, many=True)
+        return Response(serializer.data)
