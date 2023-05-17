@@ -32,6 +32,6 @@ urlpatterns = [
     path('player/list/', ShowPlayers.as_view()),
     path('playerxnation/<str:nation>',getByNationality.as_view()),
     path('playerxclub/<str:club>',getByClub.as_view()),
-    path('transfer/',TransferPlayer.as_view()),
+    path('transfer/',TransferPlayer.as_view()), 
 
 ]
