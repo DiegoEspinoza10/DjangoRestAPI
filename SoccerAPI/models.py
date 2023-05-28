@@ -17,7 +17,7 @@ class League(models.Model):
 # lower than the budget the club has. 
 class Club(models.Model):
     name = models.CharField(max_length=30)
-    budget = models.IntegerField()
+    budget = models.CharField(max_length=5)
     league = models.ForeignKey(League, on_delete=models.SET_NULL,null=True)
 
     def __str__(self):
@@ -29,8 +29,18 @@ class Player(models.Model):
     last_name = models.CharField(max_length=50)
     nationallity = models.CharField(max_length=30)
     rating = models.IntegerField()
-    price = models.IntegerField()
+    price = models.CharField(max_length=5)
     club = models.ForeignKey(Club, on_delete=models.SET_NULL,null=True)
 
     def __str__(self):
         return self.name
+
+#Creating the class User
+class User(models.Model):
+    user_name = models.CharField(max_length=30)
+    email = models.EmailField(max_length=30)
+    password = models.CharField(max_length=30)
+
+    def __str__(self):
+        return self.user_name
+    

@@ -1,8 +1,8 @@
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
-from SoccerAPI.models import League,Club,Player
-from SoccerAPI.serializer import LeagueSerializer,ClubSerializer,PlayerSerializer
+from SoccerAPI.models import League,Club,Player,User
+from SoccerAPI.serializer import LeagueSerializer,ClubSerializer,PlayerSerializer,UserSerializer
 from django.shortcuts import get_object_or_404
 
 # Create your views here.
@@ -75,12 +75,19 @@ class AddClub(APIView):
 class MoreMoney4Club(APIView):
     def put(self,request,name):
         added_money = request.data.get('money')
-        added_money
+        added_money = added_money.split('M')[0]
+        toadd = int(added_money)
         try:
             club = Club.objects.get(name=name)
         except Club.DoesNotExist:
-            return Response("Club not found",status=status.HTTP_404_NOT_FOUND)
-        club.budget += added_money
+            return Response(added_money,status=status.HTTP_404_NOT_FOUND)
+        
+        money_of_club = club.budget
+        money_of_club = money_of_club.split('M')[0]
+        intocmoney = int(money_of_club)
+        totalint = intocmoney + toadd 
+        new_budget = str(totalint)+'M'
+        club.budget = new_budget
         club.save()
         serializer = ClubSerializer(club,many=False)
         return Response(serializer.data)
@@ -142,15 +149,64 @@ class TransferPlayer(APIView):
         except:
             return Response('There is no player with that name',status=status.HTTP_404_NOT_FOUND)
         
-        if club_obj.budget < player.price:
+        club_money = club_obj.budget.split('M')[0]
+        club_money_int = int(club_money)
+        player_price = player.price.split('M')[0]
+        player_price_int = int(player_price)
+        
+        if club_money_int < player_price_int:
             return Response('The club does not have enough money to buy the player',status=status.HTTP_401_UNAUTHORIZED)
         else:
+            #Adding the player to the club and taking what the club payed for the player
             player.club = club_obj
             player.save()
-            club_obj.budget -= player.price
+            club_budget = club_money_int - player_price_int
+            new_budget = str(club_budget)+'M'
+            club_obj.budget = new_budget
             club_obj.save()
             serializer = PlayerSerializer(player,many=False)
             return Response(serializer.data)
         
-      
+#---------------------------
+#|   Views for Users       |
+#---------------------------      
+
+from rest_framework.views import APIView
+from rest_framework.response import Response
+from rest_framework import status
+
+class CreateUser(APIView):
+    def post(self, request):
+        serializer = UserSerializer(data=request.data)
+        user_email = request.data.get('email')
         
+        if serializer.is_valid():
+            if user_email.split('@')[1] == 'yopmail.com':
+                return Response('We do not accept temporary emails', status=status.HTTP_409_CONFLICT)
+            else:
+                serializer.save()
+                return Response(serializer.data, status=status.HTTP_201_CREATED)
+        else:
+            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+class ShowUsers(APIView):
+    def get(self,request):
+        users = User.objects.all()
+        serializer = UserSerializer(users, many=True)
+        return Response(serializer.data)
+    
+class Login(APIView):
+    def post(self,request):
+        email = request.data.get('email')
+        password = request.data.get('password')
+        try:
+            user = User.objects.get(email=email)
+        except:
+            return Response('No user with that email',status=status.HTTP_404_NOT_FOUND)
+        
+        if user.password == password:
+            serializer = UserSerializer(user,many=False)
+            return Response(serializer.data)
+        else:
+            return Response('Wrong password',status=status.HTTP_401_UNAUTHORIZED)
+     
