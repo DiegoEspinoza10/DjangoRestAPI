@@ -16,7 +16,7 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import path
-from SoccerAPI.views import ShowLeagues,AddLeagues,AddClub,ShowClubs,ShowClubsByLeague,MoreMoney4Club,SpecificClub,AddPlayer, ShowPlayers, getByNationality, getByClub, TransferPlayer
+from SoccerAPI.views import ShowLeagues,AddLeagues,AddClub,ShowClubs,ShowClubsByLeague,MoreMoney4Club,SpecificClub,AddPlayer, ShowPlayers, getByNationality, getByClub, TransferPlayer, CreateUser, ShowUsers,Login
 urlpatterns = [
     #------------League URLS------------
     path('league/list/',ShowLeagues.as_view()),
@@ -33,5 +33,8 @@ urlpatterns = [
     path('playerxnation/<str:nation>',getByNationality.as_view()),
     path('playerxclub/<str:club>',getByClub.as_view()),
     path('transfer/',TransferPlayer.as_view()), 
-
+    #------------Users URLS------------
+    path('adduser/',CreateUser.as_view()),
+    path('users/list/',ShowUsers.as_view()),
+    path('login/',Login.as_view()),
 ]
